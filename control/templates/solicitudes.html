@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Solicitudes de cambio</li>
+    </ol>
+  </nav>
+
+  {% include 'buscador.html' %}
+
+  <!-- Mensaje de "No se encontraron solicitudes" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron solicitudes.</strong> Intente ajustar su búsqueda.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-lg-3 g-4 mb-5">
+      {% for solicitud in page_obj %}
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title">{{ solicitud.titulo }}</h5>
+                <h6 class="text-muted">{{ solicitud.fecha }}</h6>
+              </div>
+              <p class="card-text text-muted">
+                {{ solicitud.descripcion|truncatechars:100 }}
+                <br />
+                <br />
+                <strong>Realizado por:</strong> {{ solicitud.usuario }}
+              </p>
+            </div>
+            <div class="card-footer text-center">
+              {% if solicitud.estado %}
+                <span class="badge bg-success mb-2">Realizado</span>
+              {% else %}
+                <span class="badge bg-warning text-dark mb-2">Pendiente</span>
+              {% endif %}
+              <div class="d-grid gap-2">
+                <a href="{% url 'solicitud' solicitud.id %}" class="btn btn-outline-primary btn-sm">Ver solicitud</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+  {% endif %}
+{% endblock %}

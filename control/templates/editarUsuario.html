@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'usuarios' %}">Usuarios</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Editar Usuario</li>
+    </ol>
+  </nav>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="username" class="form-label">Nombre de Usuario</label>
+      <input type="text" class="form-control" id="username" name="username" value="{{ usuario.username }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="first_name" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" value="{{ usuario.first_name }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="last_name" class="form-label">Apellido</label>
+      <input type="text" class="form-control" id="last_name" name="last_name" value="{{ usuario.last_name }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Correo Electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="groups" class="form-label">Grupo</label>
+      <select class="form-select" id="groups" name="groups" required>
+        <option value="" selected>Seleccione un grupo...</option>
+        {% for group in groups %}
+          <option value="{{ group.id }}" {% if group.id == usuario.groups.0.id %}selected{% endif %}>{{ group.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="is_active" class="form-label">Activo</label>
+      <select class="form-control" name="is_active" id="is_active" required>
+        {% if usuario.is_active %}
+          <option value="1" selected>Si</option>
+          <option value="0">No</option>
+        {% else %}
+          <option value="1">Si</option>
+          <option value="0" selected>No</option>
+        {% endif %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container text-center" style="margin-top: 100px;">
+        <div class="alert alert-danger" role="alert">
+            <h1 class="display-4">Error 404</h1>
+            <p class="lead">Página no encontrada.</p>
+            <hr class="my-4">
+            <p>La página que buscas no existe. Por favor, verifica la URL e inténtalo de nuevo.</p>
+            <a class="btn btn-success btn-lg" href="{% url 'control' %}" role="button">Volver al inicio</a>
+        </div>
+    </div>
+{% endblock %}

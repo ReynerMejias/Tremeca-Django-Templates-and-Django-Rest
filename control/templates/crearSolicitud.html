@@ -1,0 +1,106 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Crear Solicitud</li>
+    </ol>
+  </nav>
+
+  <form action="{% url 'crearSolicitud' %}" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label class="form-label">Título</label>
+      <input type="text" class="form-control" id="titulo" name="titulo" required placeholder="Ingrese el título de la solicitud" maxlength="40">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Descripción</label>
+      <textarea class="form-control" id="descripcion" name="descripcion" rows="13" required placeholder="Ingrese la descripción de la solicitud"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Cliente</label>
+      <div class="input-group">
+        <input type="text" class="form-control" id="cliente_nombre" placeholder="Seleccione un cliente" required
+        data-bs-toggle="modal" data-bs-target="#clienteModal" style="cursor: pointer;" readonly
+        onkeydown="return false;">
+
+        <input type="hidden" name="cliente" id="cliente_id">
+        <button type="button" class="btn btn-outline-danger" id="limpiarCliente" title="Limpiar selección">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear solicitud</button>
+  </form>
+
+  <!-- Modal de Búsqueda de Cliente -->
+  <div class="modal fade" id="clienteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title">Buscar Cliente</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="search" id="buscadorCliente" class="form-control mb-3" placeholder="Buscar por nombre, medidor o lote">
+          <ul class="list-group" id="resultadosClientes"></ul>
+          <div id="sinResultados" class="text-muted mt-3 d-none">No se encontraron resultados.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS del Modal -->
+  <script>
+    const inputBusqueda = document.getElementById("buscadorCliente");
+    const resultados = document.getElementById("resultadosClientes");
+    const sinResultados = document.getElementById("sinResultados");
+    const inputClienteId = document.getElementById("cliente_id");
+    const inputClienteNombre = document.getElementById("cliente_nombre");
+    const limpiarBtn = document.getElementById("limpiarCliente");
+
+    inputBusqueda.addEventListener("input", function () {
+      const query = this.value.trim();
+      resultados.innerHTML = "";
+      sinResultados.classList.add("d-none");
+
+      if (query.length < 2) return;
+
+      fetch(`/buscar-clientes/?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.results.length) {
+            sinResultados.classList.remove("d-none");
+            return;
+          }
+
+          data.results.forEach(cliente => {
+            const li = document.createElement("li");
+            li.className = "list-group-item list-group-item-action bg-dark text-white";
+            li.style.cursor = "pointer";
+            li.textContent = cliente.text;
+            li.onclick = () => {
+              inputClienteId.value = cliente.id;
+              inputClienteNombre.value = cliente.text;
+              bootstrap.Modal.getInstance(document.getElementById("clienteModal")).hide();
+            };
+            resultados.appendChild(li);
+          });
+        });
+    });
+
+    limpiarBtn.addEventListener("click", function () {
+      inputClienteId.value = "";
+      inputClienteNombre.value = "";
+      inputBusqueda.value = "";
+      resultados.innerHTML = "";
+      sinResultados.classList.add("d-none");
+    });
+  </script>
+
+{% endblock %}

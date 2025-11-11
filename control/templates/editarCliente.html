@@ -1,0 +1,65 @@
+{% extends 'index.html' %} {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'clientes' %}">Clientes</a>
+      </li>
+      <li class="breadcrumb-item">Editar cliente</li>
+    </ol>
+  </nav>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="lote" class="form-label">Numero de lote</label>
+      <input type="text" class="form-control" id="lote" name="lote" required placeholder="Ingrese el numero de lote" value="{{ cliente.lote }}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre Completo</label>
+      <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingrese su nombre completo" value="{{ cliente.nombre }}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="correo" class="form-label">Correo electronico</label>
+      <input type="email" class="form-control" id="correo" name="correo" placeholder="Ingrese su correo electronico" value="{% if cliente.correo %}{{ cliente.correo }}{% else %}{{ cliente.usuario.email }}{% endif %}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="medidor" class="form-label">Numero de Medidor</label>
+      <input type="text" class="form-control" id="medidor" name="medidor" placeholder="Ingrese el numero de medidor" value="{{ cliente.medidor }}" />
+    </div>
+
+    {% if cliente.ultima_lectura %}
+    <div class="mb-3">
+      <label for="metros" class="form-label">Metros actuales</label>
+      <a href="{% url 'editarLectura' cliente.ultima_lectura.id %}" class="form-control">{{cliente.ultima_lectura.lectura}}</a>
+    </div>
+    {% else %}
+    <div class="mb-3">
+      <label for="metros-inicial" class="form-label">Metros Iniciales</label>
+      <input type="number" class="form-control" id="metros-inicial" name="metros-inicial" required placeholder="Ingrese los metros" min="0" value="{{ cliente.metros }}" />
+    {% endif %}
+
+    <div class="mb-3">
+      <label for="lugar" class="form-label">Lugar</label>
+      <select class="form-control" name="lugar" id="lugar" required>
+        {% for lugar in lugares %}
+          {% if lugar.id == cliente.lugar.id %}
+            <option value="{{ lugar.id }}" selected>{{ lugar.nombre }}</option>
+          {% else %}
+            <option value="{{ lugar.id }}">{{ lugar.nombre }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="d-flex">
+      <button class="btn btn-primary px-5">Guardar cambios</button>
+    </div>
+  </form>
+{% endblock %}

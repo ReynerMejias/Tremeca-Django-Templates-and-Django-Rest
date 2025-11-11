@@ -1,0 +1,226 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb p-2 rounded">
+    <li class="breadcrumb-item"><a href="{% url 'control' %}">Panel de Control</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lecturas' %}">Lecturas</a></li>
+    <li class="breadcrumb-item active text-secondary">Lectura</li>
+  </ol>
+</nav>
+
+<img src="{% static 'gota.avif' %}" alt="Logo" class="d-none img-fluid mx-auto d-block mb-3 show-on-print" style="width: 80px; height: auto;">
+<h6 class="mb-0 d-none show-on-print text-center text-light">Mantenimiento de agua</h6>
+<p class="mb-0 d-none show-on-print text-center text-danger">#{{ lectura.fecha_lectura|date:'Ymd' }}{{ lectura.id }}</p>
+<hr class="d-none show-on-print">
+
+<div class="container print">
+
+  <!-- Aviso elegante para correo faltante -->
+  {% if not lectura.cliente.correo %}
+  <div class="alert alert-dark border border-secondary rounded-3 d-flex align-items-center justify-content-between shadow-sm mb-4 p-3">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-envelope-exclamation text-warning fs-5"></i>
+      <span>Este cliente no tiene correo registrado.</span>
+    </div>
+    <button class="btn btn-sm btn-outline-light px-3" data-bs-toggle="modal" data-bs-target="#correoModal">
+      <i class="bi bi-plus-circle me-1"></i> Agregar correo
+    </button>
+  </div>
+  {% endif %}
+
+  <!-- Información del Cliente -->
+  <div class="card bg-dark text-light shadow-sm mb-4 print border-secondary">
+    <div class="card-header text-center border-secondary">
+      <h6 class="mb-0">Información del Cliente</h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Nombre:</strong> {{ lectura.cliente.nombre }}</p>
+          <p><strong>Derecho#:</strong> {{ lectura.cliente.lote }}</p>
+          <p><strong>Medidor#:</strong> {{ lectura.cliente.medidor }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Lugar:</strong> {{ lectura.cliente.lugar }}</p>
+          <p><strong>Valor m³:</strong> {{ valor|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalles de la Lectura -->
+  <div class="card bg-dark text-light shadow-sm mb-4 print border-secondary">
+    <div class="card-header text-center border-secondary">
+      <h6 class="mb-0">Detalles de la Lectura</h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Lectura Anterior:</strong> {{ lectura.lectura_anterior }}</p>
+          <p><strong>Lectura Actual:</strong> {{ lectura.lectura }}</p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Consumo total:</strong> {{ consumo_total }}</p>
+          <p><strong>Fecha de emisión:</strong> {{ lectura.fecha_lectura|date:'d/m/Y' }}</p>
+          <p><strong>Vencimiento:</strong> {{ fecha_vencimiento|date:'d/m/Y' }}</p>
+        </div>
+      </div>
+    </div>
+    {% if not lectura.pago and user.is_superuser %}
+    <a href="{% url 'editarLectura' lectura.id %}" class="btn btn-outline-light w-100">Editar lectura</a>
+    {% endif %}
+  </div>
+
+  <!-- Total a Pagar -->
+  <div class="card bg-dark text-light shadow-sm mb-4 border-secondary">
+    <div class="card-header text-center border-secondary">
+      <h6 class="mb-0">Total a Pagar</h6>
+    </div>
+    <div class="card-body text-center">
+      <h3 class="fw-bold text-danger">₡{{ total_pagar|floatformat:2 }}</h3>
+      {% if lectura.moratorio > 0 %}
+      <p class="text-secondary mb-0">Incluye ₡{{ lectura.moratorio|floatformat:2 }} de moratorio</p>
+      {% if lectura.observacion %}
+      <p class="text-muted">Motivo: {{ lectura.observacion }}</p>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  {% if lectura.pago %}
+  <div class="alert alert-success text-center">✅ Este recibo ya ha sido pagado.</div>
+  <a href="{% url 'lectura_recibo_print' lectura.id %}" target="_blank" class="btn btn-outline-light w-100">Imprimir</a>
+
+  {% else %}
+  <form method="POST" action="">
+    {% csrf_token %}
+    <input type="hidden" name="form_tipo" value="pago" />
+    <input type="hidden" value="{{ total_pagar }}" name="valor" />
+
+    <div class="card bg-dark text-light border-secondary shadow-sm">
+      <div class="card-header text-center border-secondary">
+        <h5 class="mb-0">Registrar Pago</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Fecha de pago</label>
+          <input type="date" class="form-control bg-dark text-light border-secondary" name="fecha_pago" id="fecha" required value="{{ today }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tipo de pago</label>
+          <select class="form-select bg-dark text-light border-secondary" name="tipo_pago" required>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+            <option value="Depósito">Depósito</option>
+            <option value="Sinpe Móvil">Sinpe Móvil</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Comprobante de pago</label>
+          <input class="form-control bg-dark text-light border-secondary" name="comprobante" id="comprobante" />
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 mt-3">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmarPagoModal">
+        Registrar Pago
+      </button>
+      <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#moratorioModal">
+        Editar Multa / Moratorio
+      </button>
+    </div>
+
+    <!-- Modal confirmación pago -->
+    <div class="modal fade" id="confirmarPagoModal" tabindex="-1" aria-labelledby="confirmarPagoLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-secondary">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Confirmar registro de pago</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            ¿Deseas confirmar este pago? Una vez registrado, no se puede deshacer.
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  {% endif %}
+
+  <!-- Modal agregar correo -->
+  <div class="modal fade" id="correoModal" tabindex="-1" aria-labelledby="correoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary shadow-lg">
+        <form method="POST" action="">
+          {% csrf_token %}
+          <input type="hidden" name="form_tipo" value="correo" />
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title"><i class="bi bi-envelope-plus me-2"></i>Agregar correo electrónico</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <label for="correoInputModal" class="form-label">Correo del cliente</label>
+            <input type="email" name="correo" class="form-control bg-dark text-light border-secondary" id="correoInputModal" required placeholder="ejemplo@correo.com" />
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal moratorio -->
+  <div class="modal fade" id="moratorioModal" tabindex="-1" aria-labelledby="moratorioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary">
+        <form method="POST" action="">
+          {% csrf_token %}
+          <input type="hidden" name="form_tipo" value="moratorio" />
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Multa / Moratorio</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Monto (₡)</label>
+              <input type="number" name="moratorio" class="form-control bg-dark text-light border-secondary" step="1" min="0" value="{{ lectura.moratorio }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Motivo</label>
+              <input type="text" name="observacion" class="form-control bg-dark text-light border-secondary" maxlength="100" placeholder="Ej: Medidor sucio - lector" value="{{ lectura.observacion }}">
+            </div>
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-warning">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% if lectura.foto %}
+  <div class="text-center mt-3">
+    <a href="{{ lectura.foto.url }}" target="_blank" class="btn btn-outline-light w-100">🖼️ Ver Foto</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if not lectura.cliente.correo %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = new bootstrap.Modal(document.getElementById("correoModal"));
+    modal.show();
+  });
+</script>
+{% endif %}
+{% endblock %}

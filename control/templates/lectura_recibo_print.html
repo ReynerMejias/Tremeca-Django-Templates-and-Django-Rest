@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ lectura.fecha_lectura|date:'Ymd' }}{{ lectura.id }}-{{lectura.cliente.lugar.codigo}}</title>
+  <style>
+    body { font-family: monospace; font-size: 14px; }
+    .center { text-align: center; }
+    .big { font-size: 18px; font-weight: bold; }
+    hr { border: none; border-top: 1px dashed #000; margin: 10px 0; }
+  </style>
+</head>
+<body onload="window.print()">
+
+  <div class="center">
+    <p><strong>Mantenimiento de agua</strong></p>
+    <p>#{{ lectura.fecha_lectura|date:'Ymd' }}{{ lectura.id }}-{{lectura.cliente.lugar.codigo}}</p>
+  </div>
+
+  <hr>
+
+  <p>Nombre: {{ lectura.cliente.nombre }}</p>
+  <p>Derecho#: {{ lectura.cliente.lote }}</p>
+  <p>Medidor#: {{ lectura.cliente.medidor }}</p>
+  <p>Lectura anterior: {{ lectura.lectura_anterior }}</p>
+  <p>Lectura actual: {{ lectura.lectura }}</p>
+  <p>Consumo: {{ consumo_total }}</p>
+  <p>Fecha: {{ lectura.fecha_lectura|date:'d/m/Y' }}</p>
+  <p>Vence: {{ fecha_vencimiento|date:'d/m/Y' }}</p>
+
+    <hr>
+
+  {% if lectura.moratorio > 0 %}
+    <p>Multa: ₡{{ lectura.moratorio|floatformat:2 }}</p>
+    {% if lectura.observacion %}
+      <p>Motivo: {{ lectura.observacion }}</p>
+    {% endif %}
+    <hr>
+  {% endif %}
+
+  <div class="center">
+    <p class="big">Total: CRCㅤ­­{{ total_pagar|floatformat:2 }}</p>
+    <p>Gracias por su pago</p>
+  </div>
+
+
+</body>
+</html>

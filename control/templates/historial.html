@@ -1,0 +1,59 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Historial</li>
+    </ol>
+  </nav>
+
+  <!-- Mensaje de "No se encontraron historiales" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron historiales.</strong> Intente ajustar su búsqueda.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 g-4 mb-5">
+      {% for historial in page_obj %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              {% if historial.action_flag == 1 %}
+                <h5 class="card-title fw-bold" style="color: green;">Creación de un nuevo objeto</h5>
+              {% elif historial.action_flag == 2 %}
+                <h5 class="card-title fw-bold" style="color: mediumslateblue;">Modificación de un objeto existente</h5>
+              {% elif historial.action_flag == 3 %}
+                <h5 class="card-title fw-bold" style="color: red;">Eliminación de un objeto registrado</h5>
+              {% else %}
+                <h5 class="card-title fw-bold">Acción desconocida</h5>
+              {% endif %}
+              <h6>({{ historial.change_message }})</h6>
+              <p class="card-text">
+                {% if historial.action_flag == 1 %}
+                  Se ha creado un nuevo registro en el sistema. Este objeto ha sido añadido recientemente y ahora está disponible en la base de datos.
+                {% elif historial.action_flag == 2 %}
+                  Un registro existente ha sido modificado. Se han realizado cambios en el objeto para actualizar su información.
+                {% elif historial.action_flag == 3 %}
+                  Un registro ha sido eliminado del sistema. Este objeto ya no está disponible en la base de datos.
+                {% else %}
+                  Se ha registrado una acción desconocida que no pudo ser identificada correctamente.
+                {% endif %}
+              </p>
+              <p class="card-text mb-1">
+                <strong>Objeto:</strong> {{ historial.object_repr }}
+              </p>
+              <p class="text-muted small mb-0">
+                <strong>Usuario responsable:</strong> {{ historial.user }}<br />
+                <strong>Fecha y hora:</strong> {{ historial.action_time|date:'d M Y, H:i' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+  {% endif %}
+{% endblock %}

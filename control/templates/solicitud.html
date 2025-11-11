@@ -1,0 +1,58 @@
+{% extends 'index.html' %} {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'solicitudes' %}">Solicitudes de cambio</a>
+      </li>
+      <li class="breadcrumb-item">Solicitud de cambio</li>
+    </ol>
+  </nav>
+  <div class="card">
+    <div class="card-body">
+      <div class="card-title d-flex flex-row justify-content-between gap-2">
+        <h5 class="w-50">{{ solicitud.titulo }}</h5>
+        <h6>{{ solicitud.created_at }}</h6>
+      </div>
+      <hr />
+      <p class="card-text text-muted">
+        {{ solicitud.descripcion }}
+        <br />
+        <br />
+        atte. {{ solicitud.usuario.first_name }} {{ solicitud.usuario.last_name }},
+        <br />
+        {{ solicitud.usuario }},
+        <br />
+        {{ solicitud.usuario.groups.first }},
+        <br />
+        {{ solicitud.usuario.email }}.
+      </p>
+      <hr />
+      <p class="card-text text-muted">
+        <strong>Cliente seleccionado:</strong>
+        <br />
+        Nombre: {{ solicitud.cliente.nombre }}
+        <br />
+        Medidor: {{ solicitud.cliente.medidor }}
+        <br />
+        Lote: {{ solicitud.cliente.lote }}
+        <br />
+        Lugar: {{ solicitud.cliente.lugar }}
+      </p>
+      <a href="{% url 'editarCliente' solicitud.cliente.id %}">Editar</a>
+    </div>
+    <div class="card-footer text-center">
+      <form class="d-grid gap-2" action="{% url 'solicitud' solicitud.id %}" method="post">
+        {% csrf_token %}
+        {% if solicitud.estado %}
+          <span class="badge bg-success mb-2">Realizado</span>
+          {% else %}
+          <span class="badge bg-warning text-dark mb-2">Pendiente</span>
+          <button type="submit" href="" class="btn btn-outline-primary btn-sm">Hecho</button>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+{% endblock %}

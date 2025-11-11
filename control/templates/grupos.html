@@ -1,0 +1,97 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Grupos</li>
+    </ol>
+  </nav>
+
+  {% include 'buscador.html' %}
+
+  <!-- Mensaje de "No se encontraron grupos" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron grupos.</strong> Intente ajustar su búsqueda o
+      <a href="{% url 'crearGrupo' %}" class="alert-link">cree un nuevo grupo aquí</a>.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-lg-1 g-4 mb-5">
+      <div class="col">
+        <div class="card h-100 border-primary text-center">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h5 class="card-title">¿Agregar un nuevo grupo?</h5>
+            <a href="{% url 'crearGrupo' %}" class="btn btn-primary mt-2">+ Crear Grupo</a>
+          </div>
+        </div>
+      </div>
+
+      {% for grupo in page_obj %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ grupo.name }}</h5>
+                <div class="d-flex gap-1">
+                  <a href="{% url 'editarGrupo' grupo.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                  <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ grupo.id }}">Eliminar</button>
+                </div>
+              </div>
+              <p class="card-text">
+                Los permisos de este grupo son:<br />
+                {% if grupo.permissions.all|length == 0 %}
+                  <span class="badge bg-warning">Sin permisos</span>
+                {% endif %}
+                {% for grupo in grupo.permissions.all %}
+                  <span class="badge bg-primary">{{ grupo.name }}</span>
+                {% endfor %}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+
+
+
+
+    <!-- Modal de confirmación para eliminar grupo -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro de que deseas eliminar este grupo? Esta acción no se puede deshacer.
+          </div>
+          <div class="modal-footer">
+            <form method="post" id="deleteFormGrupo">
+              {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const deleteFormGrupo = document.getElementById('deleteFormGrupo');
+      const modalGrupo = document.getElementById('confirmDeleteModal');
+
+      modalGrupo.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const grupoId = button.getAttribute('data-id');
+        deleteFormGrupo.action = `eliminarGrupo/${grupoId}/`; 
+      });
+    </script>
+
+
+  {% endif %}
+{% endblock %}

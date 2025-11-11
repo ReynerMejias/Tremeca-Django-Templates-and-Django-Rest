@@ -1,0 +1,46 @@
+{% extends 'index.html' %} {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'lugares' %}">Lugares</a>
+      </li>
+      <li class="breadcrumb-item">Editar lugar</li>
+    </ol>
+  </nav>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="lugar" class="form-label">Nombre del lugar</label>
+      <input type="text" class="form-control" id="lugar" name="lugar" placeholder="Ingrese nombre del lugar" value="{{ lugar.nombre }}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="codigo" class="form-label">Codigo unico</label>
+      <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Ingrese el codigo" value="{{ lugar.codigo }}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="dia" class="form-label">Dia de corte</label>
+      <input type="number" class="form-control" id="dia" name="dia" placeholder="Ingrese el dia de corte" value="{{ lugar.dia }}" />
+    </div>
+
+    <div class="mb-3">
+      <label for="valor" class="form-label">Valor del metro agua</label>
+      <input type="number" class="form-control" id="valor" name="valor" placeholder="Ingrese el valor del metro agua" value="{{ lugar.valor }}" />
+    </div>
+
+    <div class="mb-3 d-flex flex-column">
+      <label for="orden" class="form-label">Orden personalizado</label>
+      <a href="{% url 'ordenLugar' lugar.codigo %}" class="btn btn-secondary" style="max-width: fit-content;">Ordenar</a>
+    </div>
+
+    <div class="mt-5">
+      <button class="btn btn-primary px-5 w-100">Guardar cambios</button>
+    </div>
+  </form>
+{% endblock %}

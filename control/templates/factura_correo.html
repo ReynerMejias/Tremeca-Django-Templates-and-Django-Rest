@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Factura de Pago - TREMECA</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      color: #333;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 5px;
+    }
+
+    h4 {
+      text-align: center;
+      margin-top: 0;
+      color: #555;
+    }
+
+    .factura-id {
+      text-align: center;
+      color: #d62828;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 10px;
+    }
+
+    .section:last-of-type {
+      border: none;
+    }
+
+    .label {
+      font-weight: bold;
+      display: inline-block;
+      width: 150px;
+    }
+
+    .total {
+      font-size: 22px;
+      color: #d62828;
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .estado {
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    .estado.pendiente {
+      color: #fff;
+      background-color: #e63946;
+    }
+
+    .estado.pagado {
+      color: #fff;
+      background-color: #2a9d8f;
+    }
+
+    .footer {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 30px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Mantenimiento de agua </h2>
+    <div class="factura-id">Factura #{{ lectura.fecha_lectura|date:"Ymd" }}{{ lectura.id }}-{{lectura.cliente.lugar.codigo}}</div>
+
+    <div class="section">
+      <p><span class="label">Nombre:</span> {{ lectura.cliente.nombre }}</p>
+      <p><span class="label">Derecho #:</span> {{ lectura.cliente.lote }}</p>
+      <p><span class="label">Medidor #:</span> {{ lectura.cliente.medidor }}</p>
+    </div>
+
+    <div class="section">
+      <p><span class="label">Lectura anterior:</span> {{ lectura.lectura_anterior }}</p>
+      <p><span class="label">Lectura actual:</span> {{ lectura.lectura }}</p>
+      <p><span class="label">Consumo total:</span> {{ consumo_total }} m³</p>
+      <p><span class="label">Precio por m³:</span> ₡{{ lectura.cliente.lugar.valor|floatformat:2 }}</p>
+    </div>
+
+    <div class="section">
+      <p><span class="label">Fecha de emisión:</span> {{ lectura.fecha_lectura|date:"d/m/Y" }}</p>
+      <p><span class="label">Vencimiento:</span> {{ fecha_vencimiento|date:"d/m/Y" }}</p>
+    </div>
+
+    {% if lectura.moratorio > 0 %}
+      <div class="section">
+        <p><span class="label">Multa aplicada:</span> ₡{{ lectura.moratorio|floatformat:2 }}</p>
+        {% if lectura.observacion %}
+          <p><span class="label">Motivo:</span> {{ lectura.observacion }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="total">Total a pagar: ₡{{ total_pagar|floatformat:2 }}</div>
+
+
+    <div class="section">
+      {% if lectura.pago %}
+        <div class="estado pagado">✅ Pagado</div>
+        <p><span class="label">Fecha de pago:</span> {{ lectura.pago.created_at|date:"d/m/Y" }}</p>
+        <p><span class="label">Tipo de pago:</span> {{ lectura.pago.tipo_pago }}</p>
+        {% if lectura.pago.observacion %}
+          <p><span class="label">Observación:</span> {{ lectura.pago.observacion }}</p>
+        {% endif %}
+      {% else %}
+        <div class="estado pendiente">❌ Pendiente de pago</div>
+      {% endif %}
+    </div>
+
+    <div class="footer">
+      Para cualquier consulta, visitar la oficina o contactar al administrador.<br>
+    </div>
+  </div>
+</body>
+</html>

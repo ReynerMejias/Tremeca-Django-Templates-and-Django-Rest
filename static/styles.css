@@ -1,0 +1,75 @@
+@media print {
+  header,
+  footer,
+  nav,
+  aside,
+  form,
+  iframe,
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  .print {
+    border: 0 !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .show-on-print {
+    display: block !important;
+  }
+
+  .tr-cliente-table {
+    cursor: move;
+  }
+
+  .tr-cliente-table:hover {
+    border: 1px solid #686868;
+  }
+
+  .overflow-hidden {
+    overflow: visible !important;
+  }
+  
+  .max-width-100 {
+    max-width: 100% !important;
+  }
+
+  .color-1 {
+    color: #000 !important;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  th, td {
+    border: 1px solid black;
+  }
+  
+}
+
+.alert-border-success {
+  border-left: 5px solid #198754;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
+}
+
+.alert-border-danger,
+.alert-border-error {
+  border-left: 5px solid #dc3545;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
+}
+
+.alert-border-info,
+.alert-border-warning,
+.alert-border-debug {
+  border-left: 5px solid #0d6efd;
+  background-color: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(2px);
+}

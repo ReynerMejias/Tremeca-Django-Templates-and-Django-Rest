@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container text-center" style="margin-top: 100px;">
+        <div class="alert alert-danger" role="alert">
+            <h1 class="display-4">Error 403</h1>
+            <p class="lead">Acceso denegado.</p>
+            <hr class="my-4">
+            <p>No tienes permiso para acceder a esta página. Si crees que esto es un error, por favor contacta con el administrador.</p>
+            <a class="btn btn-success btn-lg" href="{% url 'control' %}" role="button">Volver al inicio</a>
+        </div>
+    </div>
+{% endblock %}

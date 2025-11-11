@@ -1,0 +1,142 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Editar Perfil</li>
+    </ol>
+  </nav>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="username" class="form-label">Nombre de Usuario</label>
+      <input type="text" class="form-control" id="username" name="username" value="{{ usuario.username }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="first_name" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" value="{{ usuario.first_name }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="last_name" class="form-label">Apellido</label>
+      <input type="text" class="form-control" id="last_name" name="last_name" value="{{ usuario.last_name }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Correo Electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ usuario.email }}" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Contraseña</label>
+      <div class="input-group">
+        <input type="password" class="form-control mostrarContraseña" id="password" name="password" />
+        <button class="btn btn-outline-secondary" type="button" id="showPassword">Mostrar</button>
+      </div>
+    </div>
+    
+    <div>
+      <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+      <input type="password" class="form-control mostrarContraseña" id="confirm_password" name="confirm_password" />
+    </div>
+    
+    <div id="passwordHelp" class="form-text mb-3">Deje en blanco los campos de contraseña si no desea cambiarla.</div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+  </form>
+
+  <!-- Modal de error -->
+  <div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="passwordMismatchModalLabel">Error</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          Las contraseñas no coinciden. Por favor, verifica e intenta nuevamente.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Entendido</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación -->
+  <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title" id="confirmSubmitModalLabel">Confirmar cambios</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro que deseas editar el perfil? Esta acción no se puede deshacer.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="confirmSubmitBtn">Sí, guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+    document.getElementById('showPassword').addEventListener('click', function () {
+      var password = document.getElementsByClassName('mostrarContraseña');
+      for (var i = 0; i < password.length; i++) {
+        if (password[i].type === "password") {
+          password[i].type = "text";
+          this.textContent = "Ocultar";
+        } else {
+          password[i].type = "password";
+          this.textContent = "Mostrar";
+        }
+      }
+    })
+  </script>
+
+
+  <script>
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+
+      if (password && password !== confirmPassword) {
+        const mismatchModal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
+        mismatchModal.show();
+        return;
+      }
+
+      // Mostrar modal de confirmación
+      const confirmModal = new bootstrap.Modal(document.getElementById('confirmSubmitModal'));
+      confirmModal.show();
+    });
+
+    // Botón dentro del modal de confirmación
+    document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
+      // Cierra el modal y envía el formulario
+      const confirmModalEl = document.getElementById('confirmSubmitModal');
+      const modalInstance = bootstrap.Modal.getInstance(confirmModalEl);
+      modalInstance.hide();
+      form.submit();
+    });
+  </script>
+
+
+
+
+
+
+
+{% endblock %}

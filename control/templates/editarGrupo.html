@@ -1,0 +1,57 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'grupos' %}">Grupos</a>
+      </li>
+      <li class="breadcrumb-item active">Editar grupo</li>
+    </ol>
+  </nav>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre del grupo</label>
+      <input type="text" class="form-control" id="nombre" name="nombre" required placeholder="Ingrese el nombre del grupo" value="{{ grupo.name }}" />
+    </div>
+
+    <div class="mb-3">
+  <label for="nombre" class="form-label">Permisos disponibles</label>
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>ID</th>
+          <th>Codename</th>
+          <th>Name</th>
+          <th>Content Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for permiso in permisos %}
+          <tr>
+            <td>
+              <input type="checkbox" name="permisos" value="{{ permiso.id }}" {% if permiso.id in permisos_grupo %} checked {% endif %} />
+            </td>
+            <td>{{ permiso.id }}</td>
+            <td>{{ permiso.codename }}</td>
+            <td>{{ permiso.name }}</td>
+            <td>{{ permiso.content_type }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+    <div class="d-flex">
+      <button type="submit" class="btn btn-primary px-5">Editar Grupo</button>
+    </div>
+  </form>
+{% endblock %}

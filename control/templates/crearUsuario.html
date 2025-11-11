@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'usuarios' %}">Usuarios</a>
+      </li>
+      <li class="breadcrumb-item">Crear Usuario</li>
+    </ol>
+  </nav>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="username" class="form-label">Nombre de Usuario</label>
+      <input type="text" class="form-control" id="username" name="username" required placeholder="Ingrese el nombre de usuario" />
+    </div>
+
+    <div class="mb-3">
+      <label for="first_name" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="first_name" name="first_name" required placeholder="Ingrese su nombre" />
+    </div>
+
+    <div class="mb-3">
+      <label for="last_name" class="form-label">Apellido</label>
+      <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="Ingrese su apellido" />
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Correo Electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" required placeholder="Ingrese su correo electrónico" />
+    </div>
+
+    <div class="mb-3">
+      <label for="groups" class="form-label">Grupo</label>
+      <select class="form-control" name="groups" id="groups" required>
+        {% for group in groups %}
+          <option value="{{ group.id }}">{{ group.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="is_active" class="form-label">¿Está Activo?</label>
+      <select class="form-control" name="is_active" id="is_active" required>
+        <option value="0">No</option>
+        <option value="1">Sí</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="is_staff" class="form-label">¿Es Staff? (Administrador)</label>
+      <select class="form-control" name="is_staff" id="is_staff" required>
+        <option value="0">No</option>
+        <option value="1">Sí</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <button class="btn btn-primary">Crear Usuario</button>
+    </div>
+  </form>
+{% endblock %}

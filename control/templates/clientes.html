@@ -1,0 +1,106 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Clientes</li>
+    </ol>
+  </nav>
+
+  {% include 'buscador.html' %}
+
+  <!-- Mensaje de "No se encontraron clientes" -->
+  {% if not page_obj.object_list %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron clientes.</strong> Intente ajustar su búsqueda o
+      <a href="{% url 'crearCliente' %}" class="alert-link">cree un nuevo cliente aquí</a>.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-lg-3 g-4 mb-5">
+      {% if user.is_superuser %}
+        <div class="col">
+          <div class="card h-100 border-primary text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <h5 class="card-title">¿Agregar un nuevo cliente?</h5>
+              <a href="{% url 'crearCliente' %}" class="btn btn-primary mt-2">+ Crear Cliente</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      {% for cliente in page_obj %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ cliente.lote }}</h5>
+                {% if user.is_superuser %}
+                  <div class="d-flex gap-1">
+                    <a href="{% url 'editarCliente' cliente.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                    <form method="post" action="{% url 'eliminarCliente' cliente.id %}" onsubmit="return confirm('¿Estás seguro que deseas eliminar este elemento?');">
+                      <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ cliente.id }}">Eliminar</button>
+                    </form>
+                  </div>
+                {% endif %}
+              </div>
+              <p class="card-text">
+                Nombre: {{ cliente.nombre }}<br />
+                Medidor: {{ cliente.medidor }}<br />
+                {% if cliente.ultima_lectura %}
+                  Última Lectura: <a href="{% url 'lectura' cliente.ultima_lectura.id %}">{{ cliente.ultima_lectura.lectura }}</a><br />
+                {% else %}
+                  Metros Iniciales: {{ cliente.metros }}<br />
+                {% endif %}
+                Correo: {{ cliente.correo }} <br />
+                {{ cliente.lugar }}
+              </p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Actualizado el {{ cliente.updated_at }}</small>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+
+    <!-- Modal de confirmación para eliminar cliente -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro que deseas eliminar este cliente? Esta acción no se puede deshacer.
+          </div>
+          <div class="modal-footer">
+            <form method="post" id="deleteForm">
+              {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const deleteForm = document.getElementById('deleteForm');
+      const modal = document.getElementById('confirmDeleteModal');
+
+      modal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const clienteId = button.getAttribute('data-id');
+        deleteForm.action = `eliminarCliente/${clienteId}/`;
+      });
+    </script>
+
+
+
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+
+<main
+  class="d-flex justify-content-center w-100 container align-items-center"
+  style="height: 75vh; max-width: 500px"
+>
+  <form class="w-100" style="max-width: 800px" method="post">
+    {% csrf_token %}
+    <div class="d-flex flex-column align-items-center">
+      <img
+        class="mb-4"
+        src="{% static 'favicon.svg' %}"
+        alt=""
+        width="72"
+        height="57"
+      />
+      <h1 class="h3 mb-3 fw-normal">Iniciar Sesion</h1>
+    </div>
+
+    <div class="form-floating">
+      <input
+        type="text"
+        class="form-control"
+        name="username"
+        placeholder="Usuario"
+      />
+      <label for="floatingInput">Usuario</label>
+    </div>
+    <div class="form-floating my-3 position-relative">
+      <input
+        type="password"
+        class="form-control"
+        name="password"
+        placeholder="Contraseña"
+        id="passwordField"
+      />
+      <label for="floatingPassword">Contraseña</label>
+      
+      <!-- Botón para mostrar/ocultar contraseña dentro del campo -->
+      <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y" onclick="togglePasswordVisibility()" style="right: 10px;">
+        <i class="bi bi-eye" id="eyeIcon"></i>
+      </button>
+    </div>
+    
+    
+    {% if error %}
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
+    <button class="btn btn-primary w-100 py-2" type="submit" id="submitButton" disabled>Iniciar sesión</button>
+  </form>
+</main>
+
+<script>
+  document.querySelector('form').addEventListener('input', function () {
+    const username = document.querySelector('[name="username"]').value;
+    const password = document.querySelector('[name="password"]').value;
+    const submitButton = document.getElementById('submitButton');
+
+    if (username && password) {
+      submitButton.disabled = false;
+    } else {
+      submitButton.disabled = true;
+    }
+  });
+
+
+  function togglePasswordVisibility() {
+    const passwordField = document.getElementById('passwordField');
+    const eyeIcon = document.getElementById('eyeIcon');
+    
+    if (passwordField.type === 'password') {
+      passwordField.type = 'text';
+      eyeIcon.classList.remove('bi-eye');
+      eyeIcon.classList.add('bi-eye-slash');
+    } else {
+      passwordField.type = 'password';
+      eyeIcon.classList.remove('bi-eye-slash');
+      eyeIcon.classList.add('bi-eye');
+    }
+  }
+</script>
+
+{% endblock %}

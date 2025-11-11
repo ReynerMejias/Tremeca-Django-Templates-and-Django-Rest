@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container text-center" style="margin-top: 100px;">
+        <div class="alert alert-danger" role="alert">
+            <h1 class="display-4">Error 500</h1>
+            <p class="lead">Error interno del servidor.</p>
+            <hr class="my-4">
+            <p>Ha ocurrido un error interno en el servidor. Por favor, inténtalo de nuevo más tarde.</p>
+            <a class="btn btn-success btn-lg" href="{% url 'control' %}" role="button">Volver al inicio</a>
+        </div>
+    </div>
+{% endblock %}

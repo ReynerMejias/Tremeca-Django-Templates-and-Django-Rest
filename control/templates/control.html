@@ -1,0 +1,103 @@
+{% extends 'index.html' %} 
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-4 text-center">Bienvenido(a), {{ user.first_name }} {{ user.last_name }}</h3>
+  
+  <div class="row g-4">
+    {% for item in menu_items %}
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url item.url %}" class="text-decoration-none">
+                <div class="card border-1 shadow-sm text-center p-4 rounded-3 custom-card">
+                    <div class="card-body">
+                        <i class="{{ item.icon }} text-primary display-3 mb-3"></i>
+                        <h5 class="fw-semibold">{{ item.name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- Toast de créditos -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="toastCreditos" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Hecho por <a href="https://studioj2r.com/" target="_blank">J2R Studio</a> © 2025 - TREMECA
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalDescargarApp" tabindex="-1" aria-labelledby="modalDescargarAppLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="modalDescargarAppLabel">Descargar app móvil</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="mb-3">Instalá la app para registrar las lecturas.</p>
+
+        {% if apk_url %}
+          <a href="{{ apk_url }}" class="btn btn-primary w-100 mb-2" download>
+            <i class="fas fa-download me-1"></i> Descargar APK (Android)
+          </a>
+
+          {# QR simple (podés reemplazarlo por un PNG propio): #}
+          <div class="text-center mt-3">
+            <img
+              class="img-fluid rounded"
+              alt="QR descarga APK"
+              width="180" height="180"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data={{ apk_url|urlencode }}"
+            />
+            <div class="small text-secondary mt-2">Escaneá para descargar desde el teléfono</div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning">El enlace de APK no está configurado.</div>
+        {% endif %}
+
+        {% if play_url %}
+          <a href="{{ play_url }}" target="_blank" class="btn btn-outline-light w-100 mt-3">
+            Abrir en Google Play
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="modal-footer border-0 d-block">
+        <div class="small text-secondary">Solo para personal autorizado.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    const toast = new bootstrap.Toast(document.getElementById('toastCreditos'), {
+      delay: 5000 // 5 segundos visible
+    });
+    toast.show();
+  });
+</script>
+<!---Fin del toast de créditos -->
+
+<style>
+  .custom-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .custom-card i {
+    color: #007bff;
+  }
+</style>
+{% endblock %}

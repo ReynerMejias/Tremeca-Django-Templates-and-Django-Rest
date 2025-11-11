@@ -1,0 +1,82 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs y base de datos local
+*.log
+db.sqlite3
+
+# Archivos temporales
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.mo
+
+# === Django ===
+*.db
+*.sqlite3
+/media/
+/staticfiles/
+/static_root/
+/static_cdn/
+local_settings.py
+
+# === VSCode / IDEs ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# === Entorno y variables ===
+.env
+.env.local
+.env.production
+.env.development
+.env.example
+*.bak
+
+# === OS ===
+.DS_Store
+Thumbs.db
+
+# === Coverage / testing ===
+.coverage
+.tox/
+.nox/
+.pytest_cache/
+htmlcov/
+coverage.xml
+
+# === Migrations compiladas ===
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# === Otros ===
+node_modules/
+npm-debug.log

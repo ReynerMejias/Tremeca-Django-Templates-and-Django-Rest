@@ -1,0 +1,82 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'lugares' %}">Lugares</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'editarLugar' lugar.codigo %}">Editar lugar</a>
+      </li>
+      <li class="breadcrumb-item">Orden personalizado</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between mb-2 pb-2">
+    <div class="w-100">
+      <p class="text-body fs-6">Arrastra y suelta las filas para reordenar la lista.</p>
+    </div>
+  </div>
+  <form method="post" onsubmit="return confirm('¿Estás seguro que deseas cambiar el orden de la lista?');">
+    <div class="overflow-auto">
+      {% csrf_token %}
+      <input type="hidden" name="day" id="day" value="{{ lugar.dia|stringformat:'02d' }}" />
+      <input type="hidden" name="month" id="month" value="{{ selected_month|stringformat:'02d' }}" />
+      <input type="hidden" name="year" id="year" value="{{ selected_year }}" />
+
+      <table class="table text-center overflow-auto">
+        <thead>
+          <tr>
+            <th>LOTE#</th>
+            <th>MEDIDOR#</th>
+            <th>NOMBRE COMPLETO</th>
+            <th>METROS ACTUALES</th>
+          </tr>
+        </thead>
+        <tbody id="cliente-table">
+          {% for cliente in clientes %}
+            <tr class="tr-cliente-table" data-id="{{ cliente.id }}" data-order="{{ cliente.orden }}">
+              <td>{{ cliente.lote }}</td>
+              <td>{{ cliente.medidor }}</td>
+              <td>{{ cliente.nombre }}</td>
+              <td>{{ cliente.ultima_lectura.lectura }}</td>
+
+              <input type="hidden" name="order_{{ cliente.id }}" value="{{ cliente.orden }}" class="order-input" />
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Guardar orden</button>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const tableBody = document.getElementById('cliente-table')
+    
+      // Initialize Sortable
+      const sortable = new Sortable(tableBody, {
+        animation: 150,
+        onEnd: function () {
+          updateOrder()
+        }
+      })
+    
+      function updateOrder() {
+        const rows = Array.from(tableBody.rows)
+        rows.forEach((row, index) => {
+          row.setAttribute('data-order', index + 1)
+          const orderInput = row.querySelector('.order-input')
+          if (orderInput) {
+            orderInput.value = index + 1
+          }
+        })
+      }
+    
+      updateOrder()
+    })
+  </script>
+{% endblock %}

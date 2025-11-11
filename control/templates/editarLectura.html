@@ -1,0 +1,68 @@
+{% extends 'index.html' %} 
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'control' %}">Panel de Control</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'lecturas' %}">Lecturas</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Editar lectura</li>
+    </ol>
+</nav>
+
+<form action="{% url 'editarLectura' lectura.id %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="lectura" class="form-label">Lectura</label>
+        <input type="number" class="form-control" id="lectura" name="lectura" value="{{ lectura.lectura }}" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="foto" class="form-label">Foto de lectura</label>
+        <input class="form-control" type="file" id="foto" name="foto" accept="image/*" />
+        {% if lectura.foto %}
+            <p class="mt-2">Foto actual</p>
+            <img src="{{ lectura.foto.url }}" alt="Foto actual" class="img-thumbnail" style="max-width: 200px;">
+        {% endif %}
+    </div>
+    
+    <hr />
+    
+    <div class="mb-3">
+        <label for="cliente" class="form-label">Cliente</label>
+        <input type="text" class="form-control" id="cliente" value="{{ lectura.cliente.nombre }}" disabled />
+    </div>
+    
+    <div class="mb-3">
+        <label for="medidor" class="form-label">Medidor</label>
+        <input type="text" class="form-control" id="medidor" value="{{ lectura.cliente.medidor }}" disabled />
+    </div>
+    
+    <div class="mb-3">
+        <label for="lugar" class="form-label">Lugar</label>
+        <input type="text" class="form-control" id="lugar" value="{{ lectura.cliente.lugar }}" disabled />
+    </div>
+    
+    <div class="mb-3">
+        <label for="lote" class="form-label">Lote</label>
+        <input type="text" class="form-control" id="lote" value="{{ lectura.cliente.lote }}" disabled />
+    </div>
+
+    <div class="mb-3">
+        <a href="{% url 'editarCliente' lectura.cliente.id %}" >Editar cliente</a>
+    </div>
+
+    <div class="mb-3">
+        {% for message in messages %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+</form>
+{% endblock %}

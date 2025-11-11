@@ -1,0 +1,117 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Estados de cuenta</li>
+    </ol>
+  </nav>
+
+  <div class="row g-2 align-items-center mb-4 no-print">
+    <form method="GET" class="row g-2">
+      <div class="col-6 col-lg-3">
+        <label for="fecha_inicio" class="form-label">Desde:</label>
+        <input class="form-control" type="date" name="fecha_inicio" value="{{ fecha_inicio|default:'' }}" required>
+      </div>
+      <div class="col-6  col-lg-3">
+        <label for="fecha_fin" class="form-label">Hasta:</label>
+        <input class="form-control" type="date" name="fecha_fin" value="{{ fecha_fin|default:'' }}" required>
+      </div>
+      <div class="col-6 col-lg-3">
+        <label for="usuario" class="form-label">Usuario:</label>
+        <select class="form-select" name="usuario">
+          <option value="">Todos</option>
+          {% for user in usuarios %}
+            <option value="{{ user.id }}" {% if usuario_id == user.id %}selected{% endif %}>
+              {{ user.get_full_name|default:user.username }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-lg-3">
+        <label for="per_page" class="form-label">Páginacion:</label>
+        <select class="form-select" name="per_page" onchange="this.form.submit()">
+          {% for cantidad in cantidades_por_pagina %}
+            <option value="{{ cantidad }}" {% if per_page_actual == cantidad %}selected{% endif %}>
+              {{ cantidad }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-4 col-lg-4 d-grid" style="height: 50%; align-self: flex-end;">
+        <button class="btn btn-primary" type="submit">Filtrar</button>
+      </div>
+      <div class="col-4 col-lg-4 d-grid" style="height: 50%; align-self: flex-end;">
+        <a href="{% url 'estado' %}" class="btn btn-secondary">Limpiar</a>
+      </div>
+      <div class="col-4 col-lg-4 d-grid" style="height: 50%; align-self: flex-end;">
+        <button class="btn btn-secondary" onclick="window.print()">Imprimir</button>
+      </div>
+    </form>
+  </div>
+
+
+
+  {% if messages %}
+    <div class="alert-container">
+      {% for message in messages %}
+        <div class="alert alert-warning">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Mensaje de "No se encontraron historiales" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron movimientos.</strong> Intente ajustar su búsqueda.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 g-4 mb-5">
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="color-1" scope="col">Lote</th>
+          <th class="color-1" scope="col">Observación</th>
+          <th class="color-1" scope="col">Fecha del pago</th>
+          <th class="color-1" scope="col">Tipo</th>
+          <th class="color-1" scope="col">Recibido por</th>
+          <th class="color-1" scope="col">Monto</th>
+          <th class="no-print" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pago in page_obj %}
+          <tr>
+            <td class="color-1">{{pago.lectura.cliente.lote}}</td>
+            <td class="color-1">{{pago.observacion}}</td>
+            <td class="color-1">{{pago.fecha_pago|date:"d/m/Y"}}</td>
+            <td class="color-1">{{pago.tipo_pago}}</td>
+            <td class="color-1">{{pago.created_by}}</td>
+            <td class="color-1">{{pago.valor|floatformat:2}}</td>
+            <td class="no-print">
+              <a href="{% url 'lectura' pago.lectura.id %}">
+                Ver lectura
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Total -->
+  <div class="d-flex justify-content-end mt-2">
+    <div class="fw-bold">Total: {{ total|floatformat:2 }}</div>
+  </div>
+</div>
+
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+  {% endif %}
+{% endblock %}

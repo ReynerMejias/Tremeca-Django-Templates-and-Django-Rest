@@ -1,0 +1,100 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Lugares</li>
+    </ol>
+  </nav>
+
+  {% include 'buscador.html' %}
+
+  <!-- Mensaje de "No se encontraron clientes" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron lugares.</strong> Intente ajustar su búsqueda o
+      <a href="{% url 'crearLugar' %}" class="alert-link">cree un nuevo lugar aquí</a>.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-lg-3 g-4 mb-5">
+      {% if user.is_superuser %}
+        <div class="col">
+          <div class="card h-100 border-primary text-center">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+              <h5 class="card-title">¿Agregar un nuevo lugar?</h5>
+              <a href="{% url 'crearLugar' %}" class="btn btn-primary mt-2">+ Crear Lugar</a>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      {% for lugar in page_obj %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ lugar.nombre }}</h5>
+                {% if user.is_superuser %}
+                  <div class="d-flex gap-1">
+                    <a href="{% url 'editarLugar' lugar.codigo %}" class="btn btn-sm btn-secondary">Editar</a>
+                    {% if lugar.has_clients %}
+                      <button type="button" class="btn btn-sm btn-danger" disabled>Eliminar</button>
+                    {% else %}
+                      <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ lugar.id }}">Eliminar</button>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+              <p class="card-text">
+                Codigo: {{ lugar.codigo }}<br />
+                Dia de corte: {{ lugar.dia }}
+              </p>
+            </div>
+            <div class="card-footer">
+              <small class="text-body-secondary">Actualizado el {{ lugar.updated_at }}</small>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+
+
+    <!-- Modal de confirmación para eliminar lugar -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro de que deseas eliminar este lugar? Esta acción no se puede deshacer.
+          </div>
+          <div class="modal-footer">
+            <form method="post" id="deleteFormLugar">
+              {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const deleteFormLugar = document.getElementById('deleteFormLugar');
+      const modalLugar = document.getElementById('confirmDeleteModal');
+
+      modalLugar.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const lugarId = button.getAttribute('data-id');
+        deleteFormLugar.action = `eliminar/${lugarId}/`;
+      });
+    </script>
+
+
+  {% endif %}
+{% endblock %}

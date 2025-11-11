@@ -1,0 +1,107 @@
+{% extends 'index.html' %}
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">Usuarios</li>
+    </ol>
+  </nav>
+
+  {% include 'buscador.html' %}
+
+  <!-- Mensaje de "No se encontraron usuarios" -->
+  {% if not page_obj %}
+    <div class="alert alert-warning text-center" role="alert">
+      <strong>No se encontraron usuarios.</strong> Intente ajustar su búsqueda o
+      <a href="{% url 'crearUsuario' %}" class="alert-link">cree un nuevo usuario aquí</a>.
+    </div>
+  {% else %}
+    <div class="row row-cols-1 row-cols-lg-3 g-4 mb-5">
+      <div class="col">
+        <div class="card h-100 border-primary text-center">
+          <div class="card-body d-flex flex-column justify-content-center align-items-center">
+            <h5 class="card-title">¿Agregar un nuevo usuario?</h5>
+            <a href="{% url 'crearUsuario' %}" class="btn btn-primary mt-2">+ Crear Usuario</a>
+          </div>
+        </div>
+      </div>
+
+      {% for usuario in page_obj %}
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title">{{ usuario.username }}</h5>
+                <div class="d-flex gap-1">
+                  <a href="{% url 'editarUsuario' usuario.id %}" class="btn btn-sm btn-secondary">Editar</a>
+                  <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ usuario.id }}">Eliminar</button>
+                </div>
+              </div>
+              <p class="card-text">
+                Nombre: {{ usuario.first_name }} {{ usuario.last_name }}<br />
+
+                Correo Electrónico: {{ usuario.email }}<br />
+                {% if usuario.is_staff or usuario.is_super %}
+                  <span class="badge bg-primary">Administrador</span>
+                {% else %}
+                  <span class="badge bg-secondary">Usuario</span>
+                  <span class="badge bg-secondary">{{ usuario.groups.all.0 }}</span>
+                {% endif %}
+
+                {% if usuario.is_active %}
+                  <span class="badge bg-success">Activo</span>
+                {% else %}
+                  <span class="badge bg-danger">Inactivo</span>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <small class="text-muted">Se unió el {{ usuario.date_joined }}</small>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'paginacion.html' with page_obj=page_obj %}
+
+    <!-- Modal de confirmación para eliminar usuario -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar eliminación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.
+          </div>
+          <div class="modal-footer">
+            <form method="post" id="deleteFormUsuario">
+              {% csrf_token %}
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      const deleteFormUsuario = document.getElementById('deleteFormUsuario');
+      const modalUsuario = document.getElementById('confirmDeleteModal');
+
+      modalUsuario.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-id');
+        deleteFormUsuario.action = `eliminarUsuario/${userId}/`;
+      });
+    </script>
+
+
+  {% endif %}
+{% endblock %}

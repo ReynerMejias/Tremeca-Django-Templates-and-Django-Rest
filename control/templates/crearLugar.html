@@ -1,0 +1,41 @@
+{% extends 'index.html' %} {% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'control' %}">Panel de Control</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'lugares' %}">Lugares</a>
+      </li>
+      <li class="breadcrumb-item">Crear lugar</li>
+    </ol>
+  </nav>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="lugar" class="form-label">Nombre del lugar</label>
+      <input type="text" class="form-control" id="lugar" name="lugar" placeholder="Ingrese nombre del lugar" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="codigo" class="form-label">Codigo unico</label>
+      <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Ingrese el codigo" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="dia" class="form-label">Dia de corte</label>
+      <input type="number" class="form-control" id="dia" name="dia" placeholder="Ingrese el dia de corte" required />
+    </div>
+
+    <div class="mb-3">
+      <label for="valor" class="form-label">Valor del metro agua</label>
+      <input type="number" class="form-control" id="valor" name="valor" placeholder="Ingrese el valor del metro agua" required />
+    </div>
+
+    <div class="d-flex">
+      <button class="btn btn-primary px-5">Crear Lugar</button>
+    </div>
+  </form>
+{% endblock %}
