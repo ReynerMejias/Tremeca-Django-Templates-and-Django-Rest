@@ -6,5 +6,4 @@ Incluye autenticación por roles, modelos de cliente, lectura, pago y generació
 - Django 5.x
 - Django REST Framework
 - MySQL
-- WeasyPrint (PDF)
 - Bootstrap (panel web)
