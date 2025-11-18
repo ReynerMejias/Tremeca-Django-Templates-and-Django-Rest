@@ -1,75 +1,93 @@
-Tremeca Backend – Django + DRF
+# Tremeca Backend – Django + DRF
 
-Sistema backend diseñado para automatizar el registro, control y
-facturación del servicio de agua en TREMECA M&M S.A. Reemplaza procesos
-manuales basados en listas, papel y hojas de Excel.
+Sistema backend diseñado para automatizar el registro, control y facturación del servicio de agua en TREMECA M&M S.A.
+Incluye API REST completa, autenticación por roles, manejo de clientes, lecturas, pagos y generación de recibos térmicos en PDF.
 
-El backend expone una API REST completa, con autenticación por roles,
-manejo de clientes, lecturas, pagos y generación de recibos PDF.
+--------------------------------------------------------------------------------
+CARACTERÍSTICAS PRINCIPAL
+--------------------------------------------------------------------------------
+- Gestión de clientes (lotes, medidor, sector, lectura previa)
+- Registro de lecturas desde la app móvil (React Native)
+- Cálculo automático del consumo mensual
+- Control de pagos, historial y estados de cuenta
+- Generación de recibos PDF (80 mm para impresoras térmicas)
+- Sistema de roles: Administrador, Cajero y Lector
+- Panel administrativo en Bootstrap
+- API segura con permisos por vista
 
-Características principales
+--------------------------------------------------------------------------------
+### Imagen (Login del sistema):
+![Login del sistema](docs/login.png)
 
--   Gestión completa de clientes (lote, medidor, lectura anterior,
-    sector)
--   Registro de lecturas desde app móvil (React Native)
--   Cálculo automático del consumo mensual
--   Generación de recibos PDF compatibles con impresoras térmicas
--   Control de pagos, historial y estado de cuenta
--   Sistema de usuarios y roles (Admin, Lector, Cajero)
--   Panel web administrativo (Bootstrap)
--   Base de datos relacional optimizada (MySQL)
--   Autenticación segura con permisos por vista
+--------------------------------------------------------------------------------
+TECNOLOGÍAS UTILIZADAS
+--------------------------------------------------------------------------------
+- Django 5.x
+- Django REST Framework
+- MySQL
+- Bootstrap 5
+- React Native (módulo móvil)
+- ORM de Django
+- JWT / Tokens
 
-Tecnologías utilizadas
+--------------------------------------------------------------------------------
+### Imagen (Panel principal):
+![Panel principal](docs/control.png)
 
--   Django 5.x
--   Django REST Framework
--   MySQL
--   Bootstrap 5
--   React Native
--   ORM de Django
--   API REST con permisos por grupos
+--------------------------------------------------------------------------------
+IMPACTO DEL SISTEMA
+--------------------------------------------------------------------------------
+Reducción de errores:
+20% → menos del 5%
 
-Arquitectura del proyecto
+Reducción del tiempo:
+180 minutos → 30 minutos
 
-/tremeca-backend api/ clientes/ lecturas/ pagos/ usuarios/ lugares/
-core/ settings/ templates/ static/ utils/ requirements.txt manage.py
+--------------------------------------------------------------------------------
+ROLES Y PERMISOS
+--------------------------------------------------------------------------------
+ADMIN:
+    - CRUD completo
+    - Usuarios
+    - Reportes
 
-Modelo de datos (ERD)
+CAJERO:
+    - Registrar pagos
+    - Ver historial
 
-(Agregar imagen erd.png)
+LECTOR:
+    - Registrar lecturas
+    - Ver clientes asignados
 
-Diagramas de flujo
+--------------------------------------------------------------------------------
+ENDPOINTS PRINCIPALES
+--------------------------------------------------------------------------------
+Clientes:
+    GET    /api/clientes/
+    POST   /api/clientes/
+    PUT    /api/clientes/{id}/
+    DELETE /api/clientes/{id}/
 
-Proceso actual: - Uso de talonarios y listas impresas - 180 minutos por
-ciclo - 20% de error
+Lecturas:
+    POST   /api/lecturas/
+    GET    /api/lecturas/{cliente_id}/historial/
 
-Proceso optimizado: - Registro desde app móvil - Cálculo automático -
-Recibo digital
+Pagos:
+    POST   /api/pagos/
+    GET    /api/pagos/{cliente_id}/
 
-Impacto del sistema
+Usuarios:
+    POST   /api/auth/login/
+    GET    /api/usuarios/
 
--   Reducción de errores: 20% → <5%
--   Reducción del tiempo: 180 min → 30 min
+--------------------------------------------------------------------------------
+### Imagen (Vista de lecturas):
+![Vista de lecturas](docs/lecturas.png)
 
-Roles y permisos
-
-Admin: CRUD total
-Cajero: pagos
-Lector: lecturas
-
-Endpoints principales
-
-Clientes: GET /api/clientes/ POST /api/clientes/ PUT /api/clientes/{id}/
-DELETE /api/clientes/{id}/
-
-Lecturas: POST /api/lecturas/ GET /api/lecturas/{cliente_id}/historial/
-
-Pagos: POST /api/pagos/ GET /api/pagos/{cliente_id}/
-
-Usuarios: POST /api/auth/login/ GET /api/usuarios/
-
-Instalación
-
-git clone repo pip install -r requirements.txt python manage.py migrate
-python manage.py runserver
+--------------------------------------------------------------------------------
+INSTALACIÓN
+--------------------------------------------------------------------------------
+- git clone <repo><br/>
+- pip install -r requirements.txt<br/>
+- python manage.py migrate<br/>
+- python manage.py runserver<br/>
